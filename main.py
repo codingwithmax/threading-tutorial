@@ -1,34 +1,22 @@
 import time
 
-from workers.SleepyWorkers import SleepyWorker
-from workers.SquaredSumWorkers import SquaredSumWorker
+from workers.WikiWorker import WikiWorker
+from workers.YahooFinanceWorkers import YahooFinacePriceWorker
 
 
 def main():
-    calc_start_time = time.time()
+    scraper_start_time = time.time()
 
+    wikiWorker = WikiWorker()
     current_workers = []
-    for i in range(5):
-        maximum_value = (i + 1) * 1000000
-        squaredSumWorker = SquaredSumWorker(n=maximum_value)
-        current_workers.append(squaredSumWorker)
+    for symbol in wikiWorker.get_sp_500_companies():
+        yahooFinacePriceWorker = YahooFinacePriceWorker(symbol=symbol)
+        current_workers.append(yahooFinacePriceWorker)
 
     for i in range(len(current_workers)):
         current_workers[i].join()
 
-    print('Calculating sum of squares took:', round(time.time() - calc_start_time, 1))
-
-    sleep_start_time = time.time()
-
-    current_workers = []
-    for seconds in range(1, 6):
-        sleepyWorker = SleepyWorker(seconds=seconds)
-        current_workers.append(sleepyWorker)
-
-    for i in range(len(current_workers)):
-        current_workers[i].join()
-
-    print('sleep took:', round(time.time() - sleep_start_time, 1))
+    print('Extracting time took:', round(time.time() - scraper_start_time, 1))
 
 
 if __name__ == "__main__":
