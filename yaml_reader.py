@@ -26,11 +26,16 @@ class YamlPipelineExecutor():
             output_queues = worker.get('output_queues')
             worker_name = worker['name']
             num_instances = worker.get('instances', 1)
+
             init_params = {
                 'input_queue': self._queues[input_queue] if input_queue is not None else None,
                 'output_queue': [self._queues[output_queue] for output_queue in output_queues] \
                     if output_queues is not None else None
             }
+
+            input_values = worker.get('input_values')
+            if input_values is not None:
+                init_params['input_values'] = input_values
 
             self._workers[worker_name] = []
             for i in range(num_instances):

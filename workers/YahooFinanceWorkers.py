@@ -26,8 +26,6 @@ class YahooFinancePriceScheduler(threading.Thread):
                 print('Yahoo scheduler queue is empty, stopping')
                 break
             if val == 'DONE':
-                for output_queue in self._output_queues:
-                    output_queue.put('DONE')
                 break
 
             yahooFinacePriceWorker = YahooFinacePriceWorker(symbol=val)
@@ -36,6 +34,10 @@ class YahooFinancePriceScheduler(threading.Thread):
                 output_values = (val, price, datetime.datetime.utcnow())
                 output_queue.put(output_values)
             time.sleep(random.random())
+
+        for output_queue in self._output_queues:
+            for i in range(20):
+                output_queue.put('DONE')
 
 
 class YahooFinacePriceWorker():

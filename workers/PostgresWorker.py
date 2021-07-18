@@ -9,6 +9,8 @@ from sqlalchemy.sql import text
 
 class PostgresMasterScheduler(threading.Thread):
     def __init__(self, input_queue, **kwargs):
+        if 'output_queue' in kwargs:
+            kwargs.pop('output_queue')
         super(PostgresMasterScheduler, self).__init__(**kwargs)
         self._input_queue = input_queue
         self.start()
@@ -23,6 +25,7 @@ class PostgresMasterScheduler(threading.Thread):
 
             if val == 'DONE':
                 break
+            print('Received:', val)
             symbol, price, extracted_time = val
             postgresWorker = PostgresWorker(symbol, price, extracted_time)
             postgresWorker.insert_into_db()
