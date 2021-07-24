@@ -25,7 +25,7 @@ class PostgresMasterScheduler(threading.Thread):
 
             if val == 'DONE':
                 break
-            print('Received:', val)
+
             symbol, price, extracted_time = val
             postgresWorker = PostgresWorker(symbol, price, extracted_time)
             postgresWorker.insert_into_db()
@@ -37,10 +37,10 @@ class PostgresWorker():
         self._price = price
         self._extracted_time = extracted_time
 
-        self._PG_USER = os.environ.get('PG_USER') or ''
-        self._PG_PW = os.environ.get('PG_PW') or ''
-        self._PG_HOST = os.environ.get('PG_HOST') or 'localhost'
-        self._PG_DB = os.environ.get('PG_DB') or 'postgres'
+        self._PG_USER = os.environ.get('PG_USER')
+        self._PG_PW = os.environ.get('PG_PW')
+        self._PG_HOST = os.environ.get('PG_HOST')
+        self._PG_DB = os.environ.get('PG_DB')
 
         self._engine = create_engine(f'postgresql://{self._PG_USER}:{self._PG_PW}@{self._PG_HOST}/{self._PG_DB}')
 
