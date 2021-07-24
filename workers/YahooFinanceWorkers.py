@@ -35,10 +35,6 @@ class YahooFinancePriceScheduler(threading.Thread):
                 output_queue.put(output_values)
             time.sleep(random.random())
 
-        for output_queue in self._output_queues:
-            for i in range(20):
-                output_queue.put('DONE')
-
 
 class YahooFinacePriceWorker():
     def __init__(self, symbol):
