@@ -3,22 +3,20 @@ import time
 
 
 async def async_sleep():
+    print('in async sleep, at time', time.time())
     await asyncio.sleep(5)
     print('Finished sleeping')
 
 
-async def return_hello():
+async def print_hello():
+    print('in print hello, at time', time.time())
     print('Hello')
 
 
 async def main():
-    task = asyncio.create_task(async_sleep())
+
     start = time.time()
-    await asyncio.sleep(5)
-    print('Finished sleeping for 5 seconds, took', time.time() - start)
-    await task
-    print('Finished awaiting task, took', time.time() - start)
-    await return_hello()
-    print('Finished printing hello, took', time.time() - start)
+    await asyncio.gather(async_sleep(), print_hello(), async_sleep())
+    print('Finished gather, took', time.time() - start)
 
 asyncio.run(main())
