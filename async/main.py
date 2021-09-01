@@ -16,7 +16,12 @@ async def print_hello():
 async def main():
 
     start = time.time()
-    await asyncio.gather(async_sleep(), print_hello(), async_sleep())
+    try:
+        await asyncio.gather(asyncio.wait_for(async_sleep(), 1),
+                             print_hello(),
+                             async_sleep())
+    except asyncio.TimeoutError:
+        print('Encountered timeout error')
     print('Finished gather, took', time.time() - start)
 
 asyncio.run(main())
