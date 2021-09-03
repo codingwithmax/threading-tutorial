@@ -1,43 +1,42 @@
 import asyncio
-import multiprocessing
+import time
+import requests
+import aiohttp
 
 
-class MultiprocessingAsync(multiprocessing.Process):
-    def __init__(self, durations):
-        super(MultiprocessingAsync, self).__init__()
-        self._durations = durations
+async def get_url_response(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.text()
 
-    @staticmethod
-    async def async_sleep(duration):
-        await asyncio.sleep(duration)
-        return duration
 
-    async def consecutives_sleeps(self):
-        pending = set()
-        for duration in self._durations:
-            pending.add(asyncio.create_task(self.async_sleep(duration)))
+async def main():
+    urls = ['https://google.com',
+            'https://wikipedia.org/wiki/Concurrency',
+            'https://python.org',
+            'https://pypi.org/project/requests/',
+            'https://docs.python.org/3/library/asyncio-task.html',
+            'https://www.apple.com/',
+            'https://medium.com']
 
-        while len(pending) > 0:
-            done, pending = await asyncio.wait(pending, timeout=1)
-            for done_task in done:
-                print(await done_task)
+    start = time.time()
+    sync_text_response = []
+    for url in urls:
+        sync_text_response.append(requests.get(url).text)
 
-    def run(self):
-        asyncio.run(self.consecutives_sleeps())
-        print('Processed finished')
+    end_time = time.time()
+    print('Requests time:', end_time - start)
+
+    start = time.time()
+    tasks = []
+    for url in urls:
+        tasks.append(asyncio.create_task(get_url_response(url)))
+
+    async_text_response = await asyncio.gather(*tasks)
+
+    end_time = time.time()
+    print('Async requests time:', end_time - start)
 
 
 if __name__ == '__main__':
-    durations = []
-    for i in range(1, 11):
-        durations.append(i)
-
-    processes = []
-    for i in range(2):
-        processes.append(MultiprocessingAsync(durations[i*5: (i+1)*5]))
-
-    for p in processes:
-        p.start()
-
-    for p in processes:
-        p.join()
+    asyncio.run(main())
